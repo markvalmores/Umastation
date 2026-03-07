@@ -77,12 +77,7 @@ export default function App() {
   const [username, setUsername] = useState('Trainer');
   const [profilePicture, setProfilePicture] = useState('https://picsum.photos/seed/trainer/100/100');
   const [showBirthdayCalendar, setShowBirthdayCalendar] = useState(false);
-  const [showExportModal, setShowExportModal] = useState(false);
   const isDesktop = (import.meta as any).env.VITE_BUILD_TARGET === 'desktop';
-
-  const handleExport = () => {
-    setShowExportModal(true);
-  };
 
   useEffect(() => {
     const savedUser = localStorage.getItem('uma_user');
@@ -333,15 +328,6 @@ export default function App() {
                 className="bg-white/5 border border-white/10 rounded-full py-3 pl-12 pr-6 w-64 focus:outline-none focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 transition-all text-white placeholder:text-white/30"
               />
             </div>
-            {!isDesktop && (
-              <button 
-                onClick={handleExport}
-                className="px-4 py-3 rounded-full bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all text-emerald-400 text-xs font-bold flex items-center gap-2"
-              >
-                <Sparkles size={14} />
-                Export to Desktop
-              </button>
-            )}
             <ProfileMenu
               isLoggedIn={isLoggedIn}
               username={username}
@@ -766,44 +752,7 @@ export default function App() {
           </div>
         )}
         {/* Export Modal */}
-        <AnimatePresence>
-          {showExportModal && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-              onClick={() => setShowExportModal(false)}
-            >
-              <motion.div
-                initial={{ scale: 0.9 }}
-                animate={{ scale: 1 }}
-                exit={{ scale: 0.9 }}
-                className="w-full max-w-lg bg-black/90 border border-white/10 rounded-2xl p-8"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <h2 className="text-2xl font-bold text-emerald-400 mb-4">Export to Desktop</h2>
-                <p className="text-white/70 mb-6">
-                  Converting a web application to a native desktop executable (.exe) requires a build-time process. It cannot be done directly in the browser.
-                </p>
-                <div className="space-y-4 text-sm text-white/50 mb-8">
-                  <p>To create a desktop version:</p>
-                  <ol className="list-decimal list-inside space-y-2">
-                    <li>Use a framework like <a href="https://www.electronjs.org/" target="_blank" className="text-emerald-400 hover:underline">Electron</a> or <a href="https://tauri.app/" target="_blank" className="text-emerald-400 hover:underline">Tauri</a>.</li>
-                    <li>Build your project locally using <code>npm run build</code>.</li>
-                    <li>Package the output using the chosen framework.</li>
-                  </ol>
-                </div>
-                <button 
-                  onClick={() => setShowExportModal(false)}
-                  className="w-full py-3 rounded-xl bg-emerald-500 text-black font-bold hover:bg-emerald-400 transition-colors"
-                >
-                  Close
-                </button>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Removed */}
       </main>
 
       {/* Bottom Status Bar */}
