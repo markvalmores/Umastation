@@ -207,20 +207,31 @@ export default function App() {
     const fetchData = async () => {
       try {
         const fetchOptions = { cache: 'no-store' as RequestCache };
-        const [gachaRes, bdayRes, newsRes, charaRes, musicRes, videosRes] = await Promise.all([
-          fetch('/api/proxy/gacha', fetchOptions),
-          fetch('/api/proxy/birthdays', fetchOptions),
-          fetch('/api/proxy/news', fetchOptions),
-          fetch('/api/proxy/characters', fetchOptions),
-          fetch('/api/proxy/music', fetchOptions),
-          fetch('/api/proxy/videos', fetchOptions)
+        
+        const safeFetch = async (url: string, options: any) => {
+          try {
+            const res = await fetch(url, options);
+            if (!res.ok) {
+              console.warn(`Fetch failed for ${url}: ${res.status}`);
+              return null;
+            }
+            return await res.json();
+          } catch (e) {
+            console.error(`Error fetching ${url}:`, e);
+            return null;
+          }
+        };
+
+        const [gachaData, bdayData, newsData, charaData, musicData, videosData] = await Promise.all([
+          safeFetch('/api/proxy/gacha', fetchOptions),
+          safeFetch('/api/proxy/birthdays', fetchOptions),
+          safeFetch('/api/proxy/news', fetchOptions),
+          safeFetch('/api/proxy/characters', fetchOptions),
+          safeFetch('/api/proxy/music', fetchOptions),
+          safeFetch('/api/proxy/videos', fetchOptions)
         ]);
         
-        const gachaData = await gachaRes.json();
-        const bdayData = await bdayRes.json();
-        const newsData = await newsRes.json();
-        const charaData = await charaRes.json();
-        const charactersArray = Array.isArray(charaData) ? charaData : (charaData.characters || []);
+        const charactersArray = charaData ? (Array.isArray(charaData) ? charaData : (charaData.characters || [])) : [];
         
         const enrichedCharacters = charactersArray.map((chara: Character) => {
           const birthday = BIRTHDAY_MAP[chara.name_en];
@@ -231,18 +242,14 @@ export default function App() {
           };
         });
         
-        console.log("Character data:", enrichedCharacters);
-        const musicData = await musicRes.json();
-        const videosData = await videosRes.json();
-
         setGacha(Array.isArray(gachaData) ? gachaData : []);
         setBirthdays(bdayData);
         setNews(Array.isArray(newsData) ? newsData : []);
         setCharacters(enrichedCharacters);
-        setAlbums(Array.isArray(musicData) ? musicData : (musicData.albums || []));
+        setAlbums(musicData ? (Array.isArray(musicData) ? musicData : (musicData.albums || [])) : []);
         setVideos(Array.isArray(videosData) ? videosData : []);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error in fetchData:", error);
       } finally {
         setLoading(false);
       }

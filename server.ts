@@ -1,40 +1,50 @@
 import express from "express";
-import { createServer as createViteServer } from "vite";
 import path from "path";
 
 const app = express();
 
 // API Proxy Routes for umapyoi.net
 // We use a proxy to avoid CORS issues when fetching from the frontend
-const fetchOptions = { cache: 'no-store' as RequestCache };
+const fetchOptions = { 
+  cache: 'no-store' as RequestCache,
+  headers: {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+  }
+};
 
 app.get("/api/proxy/gacha", async (req, res) => {
   try {
+    console.log("Fetching gacha data...");
     const response = await fetch("https://umapyoi.net/api/v1/gacha/current", fetchOptions);
+    if (!response.ok) throw new Error(`Umapyoi API returned ${response.status}`);
     const data = await response.json();
     res.json(data);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch gacha data" });
+    console.error("Gacha fetch error:", error);
+    res.status(500).json({ error: "Failed to fetch gacha data", details: error instanceof Error ? error.message : String(error) });
   }
 });
 
 app.get("/api/proxy/birthdays", async (req, res) => {
   try {
     const response = await fetch("https://umapyoi.net/api/v1/character/currentbirthdays", fetchOptions);
+    if (!response.ok) throw new Error(`Umapyoi API returned ${response.status}`);
     const data = await response.json();
     res.json(data);
   } catch (error) {
+    console.error("Birthday fetch error:", error);
     res.status(500).json({ error: "Failed to fetch birthday data" });
   }
 });
 
-// Mocking music and news as they might not be as straightforward or public
 app.get("/api/proxy/news", async (req, res) => {
   try {
     const response = await fetch("https://umapyoi.net/api/v1/news/latest/10", fetchOptions);
+    if (!response.ok) throw new Error(`Umapyoi API returned ${response.status}`);
     const data = await response.json();
     res.json(data);
   } catch (error) {
+    console.error("News fetch error:", error);
     res.json([]);
   }
 });
@@ -42,9 +52,11 @@ app.get("/api/proxy/news", async (req, res) => {
 app.get("/api/proxy/characters", async (req, res) => {
   try {
     const response = await fetch("https://umapyoi.net/api/v1/character/list", fetchOptions);
+    if (!response.ok) throw new Error(`Umapyoi API returned ${response.status}`);
     const data = await response.json();
     res.json(data);
   } catch (error) {
+    console.error("Characters fetch error:", error);
     res.status(500).json({ error: "Failed to fetch character data" });
   }
 });
@@ -52,9 +64,11 @@ app.get("/api/proxy/characters", async (req, res) => {
 app.get("/api/proxy/music", async (req, res) => {
   try {
     const response = await fetch("https://umapyoi.net/api/v1/music/min/albums", fetchOptions);
+    if (!response.ok) throw new Error(`Umapyoi API returned ${response.status}`);
     const data = await response.json();
     res.json(data);
   } catch (error) {
+    console.error("Music fetch error:", error);
     res.status(500).json({ error: "Failed to fetch music data" });
   }
 });
@@ -62,15 +76,16 @@ app.get("/api/proxy/music", async (req, res) => {
 app.get("/api/proxy/music/album/:id", async (req, res) => {
   try {
     const response = await fetch(`https://umapyoi.net/api/v1/music/album/${req.params.id}`, fetchOptions);
+    if (!response.ok) throw new Error(`Umapyoi API returned ${response.status}`);
     const data = await response.json();
     res.json(data);
   } catch (error) {
+    console.error("Album fetch error:", error);
     res.status(500).json({ error: "Failed to fetch album data" });
   }
 });
 
 app.get("/api/proxy/videos", async (req, res) => {
-  // List of Uma Musume Music Videos (using valid YouTube video IDs)
   const musicVideos = [
     { id: 'Y-G7nP9C6-Q', title: 'Umapyoi Densetsu (MV)', category: 'Music Video' },
     { id: '6y3-z8k9vA0', title: 'GIRLS\' LEGEND U (MV)', category: 'Music Video' },
@@ -86,11 +101,9 @@ app.get("/api/proxy/videos", async (req, res) => {
   res.json(musicVideos);
 });
 
-async function startServer() {
-  const PORT = 3000;
-
-  // Vite middleware for development
-  if (process.env.NODE_ENV !== "production") {
+async function setupServer() {
+  if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
@@ -103,14 +116,14 @@ async function startServer() {
     });
   }
 
-  // Only listen if not on Vercel
   if (!process.env.VERCEL) {
+    const PORT = 3000;
     app.listen(PORT, "0.0.0.0", () => {
-      console.log(`Server running on http://localhost:${PORT}, NODE_ENV: ${process.env.NODE_ENV}`);
+      console.log(`Server running on http://localhost:${PORT}`);
     });
   }
 }
 
-startServer();
+setupServer();
 
 export default app;
