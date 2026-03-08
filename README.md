@@ -1,20 +1,39 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# UmaStation
 
-# Run and deploy your AI Studio app
+A refined, high-tech gaming dashboard for Umamusume fans. Interactive database, music player, and live gacha updates.
 
-This contains everything you need to run your app locally.
+## Deployment
 
-View your app in AI Studio: https://ai.studio/apps/93e63d72-7860-449a-82d3-d8a1ff354f99
+### Vercel
 
-## Run Locally
+This project is configured to work on Vercel as a full-stack Express app.
 
-**Prerequisites:**  Node.js
+1.  Connect your GitHub repository to Vercel.
+2.  Add your environment variables (e.g., `GEMINI_API_KEY`) in the Vercel project settings.
+3.  The `vercel.json` file handles the routing and serverless function setup.
 
+### GitHub Actions
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+You can use GitHub Actions to automate your build and deployment process.
+
+## Local Development
+
+1.  Install dependencies:
+    ```bash
+    npm install
+    ```
+2.  Start the development server:
+    ```bash
+    npm run dev
+    ```
+
+## Production Build
+
+1.  Build the frontend:
+    ```bash
+    npm run build
+    ```
+2.  Start the production server:
+    ```bash
+    npm start
+    ```

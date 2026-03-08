@@ -377,7 +377,7 @@ export default function App() {
                           </span>
                         </div>
                         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                          {banner.pickups.map((pickup, pIdx) => (
+                          {banner.pickups?.map((pickup, pIdx) => (
                             <div key={`pickup-${pickup.id || 'new'}-${pIdx}`} className="flex-shrink-0 w-12 h-12 rounded-lg border border-white/10 bg-black/60 p-1">
                               <img 
                                 src={`https://gametora.com/images/umamusume/${banner.card_type === 'Outfit' ? 'characters/chara_stand' : 'supports/support_card_s'}_${pickup.chara_id || pickup.id}_${pickup.id}.png`} 
@@ -425,9 +425,9 @@ export default function App() {
               <GlassCard title="Birthday Protocol">
                 {loading ? (
                   <div className="h-20 bg-white/5 rounded-xl animate-pulse" />
-                ) : birthdays?.current_birthdays.length ? (
+                ) : birthdays?.current_birthdays?.length ? (
                   <div className="space-y-4">
-                    {birthdays.current_birthdays.map((uma, uIdx) => (
+                    {birthdays.current_birthdays?.map((uma, uIdx) => (
                       <div 
                         key={`bday-${uma.id || 'new'}-${uIdx}`} 
                         className="flex items-center gap-4 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 cursor-pointer hover:bg-emerald-500/20 transition-colors"
